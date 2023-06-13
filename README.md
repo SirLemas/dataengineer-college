@@ -20,3 +20,7 @@ Usando os seguintes bancos:
 • https://dados.al.gov.br/catalogo/dataset/e3a5de4b-423e-45de-a35b-e16f4881415f/resource/87dccaad-76e7-4bbe-827f-b833fd33667e/download/quantidade-de-profissionais-da-saude.csv
 
 Na análise dos dados, podemos correlacionar que as cidades com mais alunos matriculados, tanto em escolas particulares como públicas, são as com maior número de profissionais de saúde. Podemos dizer, portanto, que onde há mais acesso a educação, mais profissionais de saúde serão formados naquela região
+
+# Queries para criar as tabelas
+
+rodar o arquivo queries.sql
