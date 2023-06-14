@@ -92,17 +92,28 @@ def get_datas_to_our_database_and_treatment():
 
     # removendo colunas que não serão utilizadas
     df_alunos_banco.drop(columns=['id', 'variavel','valor'], inplace=True)
-    df_saude_banco.drop(columns=['id', 'und', 'tags', 'fonte'], inplace=True)
+    df_saude_banco.drop(columns=['id', 'und', 'tags', 'fonte', 'municipio', 'geocodigo'], inplace=True)
 
     # mudando nome das colunas para não serem confundidas
-    df_alunos_banco.rename(columns={'nome_municipio':'nome_municipio_aluno', 'ano':'ano_matricula_aluno'}, inplace=True)
-    df_saude_banco.rename(columns={'geocodigo': 'codigo_municipio', 'municipio': 'nome_municipio_profissional_saude', 'variavel': 'tipo_profissional_saude'}, inplace=True)
+    df_alunos_banco.rename(columns={'nome_municipio':'nome_municipio_aluno'}, inplace=True)
+    df_saude_banco.rename(columns={'variavel': 'tipo_profissional_saude', 'ano': 'ano_profissional_saude'}, inplace=True)
 
     # Faz o merge dos data frames
-    dados_combinados = pd.merge(df_alunos_banco, df_saude_banco)
-    print(dados_combinados.columns)
-    print(dados_combinados.head(n=30))
+    dados_combinados = df_alunos_banco.merge(df_saude_banco, left_index=True, right_index=True, how='outer', suffixes=['_aluno', '_saude'])
 
+    dados_refinados = []
+    query_dados_refinados = "INSERT INTO dados_refinados (codigo_municipio, nome_municipio_aluno, ano, ensino_rede, ensino_tipo, tipo_profissional_saude, ano_profissional_saude, quantidade_profissionais_saude) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+    for index, row in dados_combinados.iterrows():
+        dados_refinados.append((row.codigo_municipio, row.nome_municipio_aluno, row.ano, row.ensino_rede, row.ensino_tipo, row.tipo_profissional_saude, row.ano_profissional_saude, row.quantidade_profissionais_saude))
+
+    dados_refinados_tupla=tuple(dados_refinados)
+
+    cur2.executemany(query_dados_refinados,dados_refinados_tupla)
+    print('Dados refinados salvo com sucesso!')
+
+    # Fecha a conexão com o banco de dados
+    connection.commit()
     cur.close()
     connection.close()
 
